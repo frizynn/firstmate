@@ -10,7 +10,7 @@
 # the one this run created.
 #
 # Covers one task lifecycle through the bin/fm-backend.sh dispatcher: container
-# ensure, create, typed and submitted input, cwd tracking, capture, agent state
+# ensure, create, submitted input, cwd tracking, capture, agent state
 # for a shell and for an agent-named process, and a proven close.
 #
 # Skips cleanly (exit 0, "skip: ...") when hc or jq is missing or a private
@@ -78,11 +78,10 @@ path_is_sub() { [ "$(fm_backend_hc_current_path "$T" "$LABEL")" = "$WORK_DIR/sub
 wait_for 10 path_is_sub || fail "current_path did not follow cd (got $(fm_backend_hc_current_path "$T" "$LABEL"))"
 pass "hc smoke: current_path follows the shell's cwd"
 
-fm_backend_hc_send_literal "$T" "echo Smoke-Literal-42" "$LABEL" || fail "send_literal failed"
-fm_backend_send_key hc "$T" Enter "$LABEL" || fail "send_key Enter failed"
-captured() { fm_backend_capture hc "$T" 50 "$LABEL" | grep -qx 'Smoke-Literal-42'; }
-wait_for 10 captured || fail "capture did not show the typed command's output"
-pass "hc smoke: send_literal plus Enter ran the command and capture shows its output"
+fm_backend_hc_send_text_line "$T" "echo Smoke-Line-42" "$LABEL" || fail "send_text_line failed"
+captured() { fm_backend_capture hc "$T" 50 "$LABEL" | grep -qx 'Smoke-Line-42'; }
+wait_for 10 captured || fail "capture did not show the submitted command's output"
+pass "hc smoke: send_text_line ran the command and capture shows its output"
 
 assert_equals "$(fm_backend_agent_state hc "$T")" dead "an idle shell is dead"
 STANDIN=$(fm_agent_standin "$HC_ROOT/standin") || { echo "skip: no agent stand-in survives a foreign name here"; exit 0; }

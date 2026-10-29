@@ -3463,9 +3463,6 @@ The default socket path under the scratchpad temp directory exceeded the 103-byt
 | `hc kill <t>` on a live shell | Exit 0; `hc get` then reports `state: finished`, `reason: killed`. |
 | `hc rm <t>` after kill | Exit 0; `hc get` then exits 3. |
 | `hc send <t> 'cd /usr'` | Pasted and submitted; `foreground.cwd` became `/usr`. |
-| `hc keys` with one key per character for uppercase letters, hyphen, slash, apostrophe, semicolon, backtick, backslash, equals, period, comma, and brackets | Each was typed, with uppercase letters arriving lowercase: only unshifted keys type their character. |
-| `hc keys` with a double quote, plus, dollar, parentheses, underscore, colon, tilde, or `é` | Each refused with `invalid_params` and `unknown key`. |
-| `hc keys <t> shift+a` / `shift+4` | Typed `A` / `4`: `shift+` reaches letters only. |
 | `hc get` of a terminal running the user's `claude` wrapper | `foreground` was `{"name":"hats","argv":["/Users/fran/.cargo/bin/hats","run","--"]}`; the Claude process was another member of that process group. |
 
 ### Adapter lifecycle
@@ -3473,9 +3470,9 @@ The default socket path under the scratchpad temp directory exceeded the 103-byt
 `tests/fm-backend-hc-smoke.test.sh` passed against its own private core, which it stopped on exit:
 
 ```text
-ok - hc smoke: create_task started fmt81680:t1
+ok - hc smoke: create_task started fmt55488:t1
 ok - hc smoke: current_path follows the shell's cwd
-ok - hc smoke: send_literal plus Enter ran the command and capture shows its output
+ok - hc smoke: send_text_line ran the command and capture shows its output
 ok - hc smoke: agent_state reads dead for a shell and alive for an agent-named foreground
 ok - hc smoke: kill closes and removes the terminal
 FM_TEST_COMPLETE

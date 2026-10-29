@@ -2,7 +2,7 @@
 # tests/fm-backend-hc.test.sh - fake-hc-CLI unit tests for the herdr-core
 # session-provider adapter (bin/backends/hc.sh) and its dispatcher arms in
 # bin/fm-backend.sh. tests/fm-backend-hc-smoke.test.sh drives a real isolated
-# hc core; this suite pins selection, identity, typing, liveness, and close
+# hc core; this suite pins selection, identity, keys, liveness, and close
 # behavior with a stub so it runs everywhere.
 set -u
 
@@ -121,19 +121,20 @@ test_create_task_is_independent_labeled_and_refuses_duplicates() {
   pass "hc: create_task starts an independent labeled terminal and refuses a duplicate"
 }
 
-test_send_literal_types_keys_and_refuses_untypeable_text() {
-  local out tag
-  setup_case literal
+test_control_interrupt_delivers_the_harness_keys() {
+  local tag out rc=0 id=hcint1
+  setup_case interrupt
   tag=$(hometag_of)
-  write_terminal "$D" t2 live fm-a1 "$tag" zsh /bin/zsh
-  hc_shell 'fm_backend_hc_send_literal fmtest:t2 "Ab c" fm-a1' || fail "typeable literal must succeed"
-  out=$(grep $'\x1fkeys\x1f' "$D/log")
-  assert_contains "$out" $'t2\x1fshift+a\x1fb\x1fspace\x1fc' "uppercase maps to shift+<letter>, space to space"
-  : > "$D/log"
-  # shellcheck disable=SC2016 # the inner shell expands it
-  expect_refused hc_shell 'fm_backend_hc_send_literal fmtest:t2 "echo \$HOME" fm-a1'
-  assert_not_contains "$(cat "$D/log")" $'\x1fkeys\x1f' "untypeable text must not be half-typed"
-  pass "hc: send_literal types through keys and refuses text it cannot type"
+  write_terminal "$D" t2 live "fm-$id" "$tag" 2.1.312 claude
+  mkdir -p "$HOMEDIR/state" "$HOMEDIR/data"
+  printf 'window=fmtest:t2\nendpoint_task_id=%s\nworktree=%s\nproject=%s\nharness=claude\nkind=scout\nbackend=hc\nhc_session=fmtest\nhc_terminal=t2\n' \
+    "$id" "$D" "$D" > "$HOMEDIR/state/$id.meta"
+  out=$(FAKE_HC_DIR=$D PATH="$FB:$PATH" FM_HOME=$HOMEDIR FM_ROOT_OVERRIDE=$HOMEDIR \
+    FM_STATE_OVERRIDE="$HOMEDIR/state" FM_DATA_OVERRIDE="$HOMEDIR/data" FM_CONTROL_POLL=0.05 \
+    "$FM_TEST_ROOT/bin/fm-control.sh" "$id" interrupt 2>&1) || rc=$?
+  expect_code 0 "$rc" "interrupt on an hc task should succeed"$'\n'"$out"
+  assert_contains "$(grep $'\x1fkeys\x1f' "$D/log")" $'keys\x1f--json\x1ft2\x1fesc' "interrupt must press Escape on the recorded terminal"
+  pass "hc: fm-control interrupt delivers the harness's interrupt key"
 }
 
 test_foreign_or_unlabeled_terminal_gets_no_input_and_no_close() {
@@ -220,7 +221,7 @@ test_endpoint_validation_binds_hc_meta() {
 fm_test_run \
   test_hc_is_spawn_capable_and_never_autodetected \
   test_create_task_is_independent_labeled_and_refuses_duplicates \
-  test_send_literal_types_keys_and_refuses_untypeable_text \
+  test_control_interrupt_delivers_the_harness_keys \
   test_foreign_or_unlabeled_terminal_gets_no_input_and_no_close \
   test_invalid_session_never_reaches_hc \
   test_agent_state_classifies_foreground_and_absence \

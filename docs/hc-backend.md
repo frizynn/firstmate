@@ -58,7 +58,6 @@ An input, capture, or close that carries the task label refuses a terminal whose
 | Capture | `hc read --lines <n>` |
 | Visible capture | `hc read --lines 0` |
 | Send a line and submit | `hc send` |
-| Type without submitting | `hc keys`, one key per character |
 | Named key | `hc keys` |
 | Current path | `hc get`, the foreground process's `cwd` |
 | Busy state | `hc get`, native `status.state` (`working` is busy) |
@@ -67,9 +66,8 @@ An input, capture, or close that carries the task label refuses a terminal whose
 
 ## Limits
 
-- `hc send` always presses Enter.
-  Typing without submitting goes through `hc keys`, which has keys only for letters, digits, space, hyphen, slash, apostrophe, semicolon, backtick, backslash, equals, period, comma, and brackets; text with any other character is refused rather than half-typed.
-  The spawn launch line `. '<launch file>'` always carries a `+` and can carry a `_`, so `bin/fm-spawn.sh` pastes and submits it with `hc send` and consumes the Enter that follows it.
+- `hc send` always presses Enter, so hc cannot type without submitting.
+  `bin/fm-spawn.sh` pastes and submits the spawn launch line with `hc send` and consumes the Enter that follows it.
 - Submitting a message uses `hc send` and then reads the composer; only a proven pending composer gets Enter retries.
 - hc reports one foreground process per terminal.
   When that process is a launcher, the adapter also reads the rest of its process group from `ps`, which works only for terminals on the local machine.

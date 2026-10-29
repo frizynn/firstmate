@@ -38,9 +38,7 @@
 #
 # Measured limits on hc 0.1.13 (docs/hc-backend.md "Limits"):
 #   - `hc send` always presses Enter after pasting. There is no paste without
-#     submit, so send_literal types through `hc keys`, one key per character,
-#     which covers only [A-Za-z0-9] and space - / ' ; ` \ = . , [ ]. Text with
-#     any other character is refused rather than half-typed.
+#     submit, so hc cannot type without submitting.
 #   - hc reports one foreground process per terminal (`foreground` in
 #     `hc get`), not a process group; agent_state classifies that one process.
 #   - hc has no event push this adapter consumes; supervision polls like tmux.
@@ -218,39 +216,6 @@ fm_backend_hc_send_key() {  # <target> <key> [expected-label]
   fm_backend_hc_target_ready "$1" "${3:-}" || return 1
   fm_backend_hc_cli "$FM_BACKEND_HC_SESSION" keys --json "$FM_BACKEND_HC_ADDRESS" \
     "$(fm_backend_hc_normalize_key "$2")" >/dev/null 2>&1
-}
-
-# fm_backend_hc_literal_keys: one hc key name per character of <text>, one per
-# line, or return 1 when a character has no unshifted key (see the header).
-fm_backend_hc_literal_keys() {  # <text>
-  local text=$1 i ch
-  for ((i = 0; i < ${#text}; i++)); do
-    ch=${text:i:1}
-    case "$ch" in
-      ' ') printf 'space\n' ;;
-      # Explicit sets, not [a-z] ranges: a locale's collation can put
-      # uppercase letters inside a lowercase range.
-      [abcdefghijklmnopqrstuvwxyz0123456789]|-|/|"'"|';'|'`'|\\|=|.|,|'['|']') printf '%s\n' "$ch" ;;
-      [ABCDEFGHIJKLMNOPQRSTUVWXYZ]) printf 'shift+%s\n' "$(printf '%s' "$ch" | LC_ALL=C tr '[:upper:]' '[:lower:]')" ;;
-      *) return 1 ;;
-    esac
-  done
-}
-
-# fm_backend_hc_send_literal: type <text> without submitting.
-fm_backend_hc_send_literal() {  # <target> <text> [expected-label]
-  local keys
-  local -a argv=()
-  keys=$(fm_backend_hc_literal_keys "$2") || {
-    echo "error: hc cannot type this text without submitting it (only letters, digits, space and - / ' ; \` \\ = . , [ ] have keys)" >&2
-    return 1
-  }
-  fm_backend_hc_target_ready "$1" "${3:-}" || return 1
-  [ -n "$keys" ] || return 0
-  while IFS= read -r ch; do argv+=("$ch"); done <<EOF
-$keys
-EOF
-  fm_backend_hc_cli "$FM_BACKEND_HC_SESSION" keys --json "$FM_BACKEND_HC_ADDRESS" "${argv[@]}" >/dev/null 2>&1
 }
 
 # fm_backend_hc_send_text_line: paste one line and submit it (`hc send`).
