@@ -1,0 +1,3 @@
+fm_backend_detect with HC_TERMINAL_ID=t9, no config: []
+fm_backend_name: [tmux]
+fm_backend_name with FM_BACKEND=hc: [hc]

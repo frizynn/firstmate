@@ -1,0 +1,11 @@
+# claude 2.1.312 (Claude Code): foreground={"argv":["/Users/fran/.local/bin/claude"],"cwd":"/private/tmp/fmhl.PanBHr/wt","name":"2.1.312","pid":88697}
+ok - hc liveness: claude 2.1.312 (Claude Code) classifies alive in hc 0.1.13
+# codex codex-cli 0.163.0: foreground={"argv":["/Users/fran/.local/bin/codex"],"cwd":"/private/tmp/fmhl.PanBHr/wt","name":"codex","pid":88923}
+ok - hc liveness: codex codex-cli 0.163.0 classifies alive in hc 0.1.13
+# skip: opencode is not installed on this machine
+# skip: pi is not installed on this machine
+# skip: grok is not installed on this machine
+# skip: kimi is not installed on this machine
+# unverified on this machine (not installed): opencode pi grok kimi
+# checked 2 installed harness(es)
+FM_TEST_COMPLETE

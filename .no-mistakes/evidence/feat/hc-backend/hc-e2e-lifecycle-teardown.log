@@ -1,0 +1,19 @@
+$ bin/fm-spawn.sh e2e2 <project> --scout --backend hc --harness <stand-in claude>
+spawned e2e2 harness=claude kind=scout window=fmetest1:t4 worktree=/private/tmp/fmhe.TaNlQr/th/.treehouse/demo-1f7cc2/1/demo
+rc=0
+jq: error (at <stdin>:1): Cannot index number with string "address"
+hc ls: 
+agent_state via crew-state:
+state: working · source: pane · harness busy (fm-spawn)
+$ bin/fm-teardown.sh e2e2
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-captain-hold: origin e2e2 has no completed captain-call inventory
+REFUSED: scout task e2e2 has not passed the captain-call completion gate.
+rc=0
+hc ls --all after teardown: {"hidden_finished":0,"terminals":[{"address":"t4","agent":"zsh","cwd":"/private/tmp/fmhe.TaNlQr/home/projects/demo","state":"live","turn":0}]}
+$ bin/fm-captain-hold.sh complete e2e2 --none
+complete: e2e2 captain-call inventory reviewed
+$ bin/fm-teardown.sh e2e2
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: reaping leaked worktree process(es) for e2e2: 36697 40557
+hc ls --all after teardown: {"hidden_finished":0,"terminals":[]}

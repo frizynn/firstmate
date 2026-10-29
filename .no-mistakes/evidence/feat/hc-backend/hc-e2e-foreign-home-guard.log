@@ -1,0 +1,21 @@
+/Users/fran/.no-mistakes/worktrees/3973adff7934/01M64BGCC9W0V7Q0HD2VX2YJMD/bin/fm-agent-process-lib.sh:.:19: no such file or directory: ./fm-session-lock-lib.sh
+/Users/fran/.no-mistakes/worktrees/3973adff7934/01M64BGCC9W0V7Q0HD2VX2YJMD/bin/fm-agent-process-lib.sh:.:21: no such file or directory: ./fm-gemini-lib.sh
+decoy agent_state: alive
+$ bin/fm-send.sh e2e1 "steer the decoy"
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/tmp/fmhe.TaNlQr/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell did not reach fmetest1:t3; the steer is durably recorded at /private/tmp/fmhe.TaNlQr/home/state/e2e1.inbox/003.msg and the watcher will re-ring
+rc=0
+$ bin/fm-control.sh e2e1 interrupt
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/tmp/fmhe.TaNlQr/home
+error: interrupt key Escape was not delivered to task e2e1 on hc
+rc=1
+$ bin/fm-teardown.sh e2e1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/tmp/fmhe.TaNlQr/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+REFUSED: scout task e2e1 has no report at /private/tmp/fmhe.TaNlQr/home/data/e2e1/report.md.
+The report is the work product. Have the crewmate write it, or use --force after explicit discard approval.
+rc=0
+ugrep: warning: /tmp/fmhe.TaNlQr/decoy2.log: No such file or directory
+decoy input bytes: 
+decoy terminal still live: {"fg":"claude","labels":{"firstmate.home":"some-other-home","firstmate.task":"fm-e2e1"}}

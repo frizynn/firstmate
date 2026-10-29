@@ -1,0 +1,2 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/tmp/fmhe.TaNlQr/home
+spawned e2e1 harness=claude kind=scout window=fmetest1:t1 worktree=/private/tmp/fmhe.TaNlQr/th/.treehouse/demo-1f7cc2/1/demo

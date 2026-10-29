@@ -1,0 +1,9 @@
+$ bin/fm-teardown.sh e2e1 --force   (meta still points at the other home's terminal t3)
+error: hc terminal fmetest1:t3 does not carry this task's labels; refusing to close it
+error: the hc endpoint fmetest1:t3 for e2e1 could not be closed, so it may still be live.
+error: --force authorizes continuing past a close that failed, so this cleanup proceeds toward removing the task's records; reconcile fmetest1:t3 yourself, because nothing here can still be relied on to name it.
+teardown e2e1 complete (window fmetest1:t3, worktree /private/tmp/fmhe.TaNlQr/th/.treehouse/demo-1f7cc2/1/demo)
+Backlog: e2e1 just finished (this home keeps no markdown backlog at /private/tmp/fmhe.TaNlQr/home/data/backlog.md). Update /private/tmp/fmhe.TaNlQr/home/data/backlog.md - move e2e1 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+rc=0
+t3 after: {"fg":"claude","labels":{"firstmate.home":"some-other-home","firstmate.task":"fm-e2e1"}}
+decoy bytes total: 0
