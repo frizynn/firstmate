@@ -193,6 +193,20 @@ test_kill_proves_the_terminal_is_gone() {
   pass "hc: kill ends and removes the terminal and refuses when it survives"
 }
 
+test_kill_refuses_another_tasks_terminal() {
+  local tag
+  setup_case kill-label
+  tag=$(hometag_of)
+  write_terminal "$D" t1 live fm-other "$tag" zsh /bin/zsh
+  write_terminal "$D" t2 live fm-a1 "$tag" zsh /bin/zsh
+  expect_refused hc_shell 'fm_backend_kill hc fmtest:t1 "" fm-a1'
+  [ -f "$D/t1.json" ] || fail "another task's terminal must stay alive"
+  assert_not_contains "$(cat "$D/log")" $'\x1fkill\x1f' "another task's terminal must not be closed"
+  hc_shell 'fm_backend_kill hc fmtest:t2 "" fm-a1' || fail "closing the task's own labeled terminal must succeed"
+  [ ! -f "$D/t2.json" ] || fail "the task's own terminal must be removed"
+  pass "hc: teardown's expected label refuses another task's terminal and closes the matching one"
+}
+
 test_capture_and_current_path_read_the_recorded_terminal() {
   local tag out
   setup_case read
@@ -226,5 +240,6 @@ fm_test_run \
   test_invalid_session_never_reaches_hc \
   test_agent_state_classifies_foreground_and_absence \
   test_kill_proves_the_terminal_is_gone \
+  test_kill_refuses_another_tasks_terminal \
   test_capture_and_current_path_read_the_recorded_terminal \
   test_endpoint_validation_binds_hc_meta

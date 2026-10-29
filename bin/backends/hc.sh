@@ -276,8 +276,8 @@ fm_backend_hc_busy_state() {  # <target>
 # fm_backend_hc_kill: end the program and remove the terminal, then prove it is
 # gone. Already absent is a silent success; a terminal still present, a core
 # that cannot be read, or a terminal without this home's labels is a refusal.
-fm_backend_hc_kill() {  # <target> [expected-label]
-  local target=$1 expected=${2:-'*'} state
+fm_backend_hc_kill() {  # <target> [unused] [expected-label]
+  local target=$1 expected=${3:-'*'} state
   fm_backend_hc_parse_target "$target" || return 1
   state=$(fm_backend_hc_endpoint_state "$target" "$expected")
   case "$state" in
