@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Environment for driving fm-* scripts against the lab home and private hc core.
+exec env -u NO_MISTAKES_GATE -u FM_GATE_REFUSE_BYPASS -u FM_ROOT_OVERRIDE -u FM_STATE_OVERRIDE -u FM_DATA_OVERRIDE -u FM_CONFIG_OVERRIDE -u FM_PROJECTS_OVERRIDE -u HC_TERMINAL_ID -u HC_TERMINAL_SOCKET -u HC_SCOPE -u TMUX -u HERDR_ENV   FM_HOME=/private/tmp/fmsp.xfmVSa/lab HC_SESSION=fmsp1 XDG_STATE_HOME=/tmp/fmsp.xfmVSa/x XDG_RUNTIME_DIR=/tmp/fmsp.xfmVSa/x XDG_CONFIG_HOME=/tmp/fmsp.xfmVSa/x/config XDG_DATA_HOME=/tmp/fmsp.xfmVSa/x/data XDG_CACHE_HOME=/tmp/fmsp.xfmVSa/x/cache TREEHOUSE_ROOT=/tmp/fmsp.xfmVSa/tree DISABLE_AUTOUPDATER=1 "$@"

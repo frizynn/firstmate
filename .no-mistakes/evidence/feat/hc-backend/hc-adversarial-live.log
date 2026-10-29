@@ -1,0 +1,19 @@
+task fm-a1 -> fmadv4544:t1 ; task fm-other -> fmadv4544:t2
+labels on fmadv4544:t1: {"firstmate.home":"firstmate-2f642587","firstmate.task":"fm-a1","herdr.space":"fm-firstmate-2f642587","herdr.tab":"firstmate-2f642587-fm-a1"}
+PASS - kill refused: error: hc terminal fmadv4544:t2 does not carry this task's labels; refusing to close it
+PASS - fm-other terminal still alive after refused kill
+PASS - send_text_line refused foreign label
+PASS - capture refused foreign label
+PASS - send_key C-c refused foreign label
+PASS - send_key C-c delivered
+PASS - send_key Escape delivered
+PASS - send_key C-u delivered
+PASS - C-c interrupted sleep; next command ran
+PASS - send_key Enter delivered
+PASS - empty/invalid session refused with 0 hc calls (rc=1,1,1,1): error: refusing hc session '' 
+PASS - all 2 hc calls pinned HC_SESSION=fmadv4544 despite caller HC_SESSION=someothercore
+PASS - kill with matching label fm-a1 closed fmadv4544:t1
+PASS - cleanup kill of fm-other
+PASS - inherited HC_TERMINAL_ID does not select hc (rc=1 name=tmux)
+PASS - FM_BACKEND=hc and config/backend=hc select hc
+FAILURES=0

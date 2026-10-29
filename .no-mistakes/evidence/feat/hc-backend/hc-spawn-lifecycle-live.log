@@ -1,0 +1,37 @@
+== spawn scout1 (raw launch, env dump) ==
+spawned scout1 harness=bash kind=scout window=fmsp1:t1 worktree=/private/tmp/fmsp.xfmVSa/tree/.treehouse/demo-0652ee/1/demo
+-- state/scout1.meta was:
+backend=hc window=fmsp1:t1 hc_session=fmsp1 hc_terminal=t1
+-- worker env inside hc terminal:
+FM_TASK_ID=scout1
+HC_SCOPE=15089092430153-1f4a2eda5d2cde916e259a7e1fe75c56
+HC_SESSION=fmsp1
+HC_TERMINAL_ID=t1
+HC_TERMINAL_SOCKET=/tmp/fmsp.xfmVSa/x/herdr-core/fmsp1.sock
+
+== scout1 fm-control interrupt (harness=bash) ==
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/tmp/fmsp.xfmVSa/lab
+error: task scout1 records harness 'bash', which has no verified control mechanics; fm-control refuses to guess an interrupt key or exit command
+
+== scout3 spawn + fm-control interrupt (harness=claude stand-in, C binary that prints received bytes) ==
+spawned scout3 harness=claude kind=scout window=fmsp1:t3 worktree=/private/tmp/fmsp.xfmVSa/tree/.treehouse/demo-0652ee/2/demo
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/tmp/fmsp.xfmVSa/lab
+interrupt-delivered scout3 harness=claude backend=hc verified=endpoint cancel=unconfirmed
+terminal shows: STANDIN-READY / GOT 1b  (0x1b = Escape)
+
+== teardown scout3 with stale meta pointing at scout1's terminal t1 ==
+error: hc terminal fmsp1:t1 does not carry this task's labels; refusing to close it
+error: the hc endpoint fmsp1:t1 for scout3 could not be closed, so it may still be live.
+error: --force authorizes continuing past a close that failed, so this cleanup proceeds toward removing the task's records; reconcile fmsp1:t1 yourself, because nothing here can still be relied on to name it.
+teardown scout3 complete (window fmsp1:t1, worktree /private/tmp/fmsp.xfmVSa/tree/.treehouse/demo-0652ee/2/demo)
+t1 after: address=t1 firstmate.task=fm-scout1 foreground=cat (still alive)
+
+== --secondmate on hc ==
+error: backend=hc does not support --secondmate spawns yet
+
+== teardown scout1 ==
+teardown scout1 complete (window fmsp1:t1, worktree /private/tmp/fmsp.xfmVSa/tree/.treehouse/demo-0652ee/1/demo)
+hc ls after all teardowns: []
+
+~/.local/bin/claude: /Users/fran/.local/share/claude/versions/2.1.312
+~/.claude/settings.json mtime: Oct 27 19:12:12 2026
