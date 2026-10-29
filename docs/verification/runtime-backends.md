@@ -3447,3 +3447,47 @@ The full run's native Ahoy cases depend on the model's own choices and failed wi
 
 A real `bin/fm-spawn.sh --scout --harness opencode --model opencode-go/deepseek-v4.1-flash` in a private tmux server recorded `opencode_version=1.18.20` (and `1.18.31` on the second release), launched the worker as `opencode --model opencode-go/deepseek-v4.1-flash --prompt <brief>` with no `--standalone`, and the worker answered its brief.
 `bin/fm-control.sh <task> exit` then resolved the typed `/exit` from that recorded major and returned both panes to the shell.
+
+## hc
+
+Measured on 2026-10-29 with `hc 0.1.13` on macOS (Darwin 27.0.0, `/bin/bash` 3.2.57), against private cores only: a unique `HC_SESSION`, `XDG_STATE_HOME` and `XDG_RUNTIME_DIR` under a short `/tmp/fmhc.*` directory, and `HC_TERMINAL_ID`, `HC_TERMINAL_SOCKET`, and `HC_SCOPE` unset.
+The default socket path under the scratchpad temp directory exceeded the 103-byte unix socket limit, which `hc` reports as a usage error, so the private root must be short.
+
+### CLI facts the adapter depends on
+
+| Probe | Result |
+| --- | --- |
+| `HC_SESSION=<private>` with an inherited `HC_TERMINAL_SOCKET` naming another core | `hc ls` listed only the private core's terminals. |
+| `hc run --bg --json --no-parent --outlive-parent --no-notify --cwd /tmp --label firstmate.task=x` with no argv | Started the user's login shell; printed `{"address":"t2","agent":"zsh",...}`. |
+| `hc get <missing>` | Exit 3, `{"error":{"kind":"not_found",...}}` on stderr. |
+| `hc kill <t>` on a live shell | Exit 0; `hc get` then reports `state: finished`, `reason: killed`. |
+| `hc rm <t>` after kill | Exit 0; `hc get` then exits 3. |
+| `hc send <t> 'cd /usr'` | Pasted and submitted; `foreground.cwd` became `/usr`. |
+| `hc keys` with one key per character for uppercase letters, hyphen, slash, apostrophe, semicolon, backtick, backslash, equals, period, comma, and brackets | Each was typed, with uppercase letters arriving lowercase: only unshifted keys type their character. |
+| `hc keys` with a double quote, plus, dollar, parentheses, underscore, colon, tilde, or `é` | Each refused with `invalid_params` and `unknown key`. |
+| `hc keys <t> shift+a` / `shift+4` | Typed `A` / `4`: `shift+` reaches letters only. |
+| `hc get` of a terminal running the user's `claude` wrapper | `foreground` was `{"name":"hats","argv":["/Users/fran/.cargo/bin/hats","run","--"]}`; the Claude process was another member of that process group. |
+
+### Adapter lifecycle
+
+`tests/fm-backend-hc-smoke.test.sh` passed against its own private core, which it stopped on exit:
+
+```text
+ok - hc smoke: create_task started fmt81680:t1
+ok - hc smoke: current_path follows the shell's cwd
+ok - hc smoke: send_literal plus Enter ran the command and capture shows its output
+ok - hc smoke: agent_state reads dead for a shell and alive for an agent-named foreground
+ok - hc smoke: kill closes and removes the terminal
+FM_TEST_COMPLETE
+```
+
+A real Claude Code launch through the user's `claude` wrapper, typed into a task terminal with `fm_backend_hc_send_text_line` and never given a prompt, read `alive` from `fm_backend_agent_state` within three polls, and `fm_backend_kill` returned 0 with no surviving member of its process group.
+Before reading the process group, the same launch read `ambiguous`.
+
+### Not verified
+
+- A full `bin/fm-spawn.sh` ship or scout spawn with `--backend hc`, including `treehouse get` inside the terminal and the launch-line typing.
+- Teardown through `bin/fm-teardown.sh`, `bin/fm-send.sh` steering, and `bin/fm-peek.sh` against an hc task.
+- Submit confirmation against a real harness composer, since no prompt was submitted.
+- Native `status.state` under Firstmate's cleared launch environment.
+- How the `herdr.space` and `herdr.tab` labels display in Herdr.app.
