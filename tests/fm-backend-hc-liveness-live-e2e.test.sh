@@ -32,6 +32,9 @@ export HC_SESSION="fmhl$$"
 export XDG_STATE_HOME="$LAB" XDG_RUNTIME_DIR="$LAB" XDG_CONFIG_HOME="$LAB/config"
 export XDG_DATA_HOME="$LAB/data" XDG_CACHE_HOME="$LAB/cache"
 export FM_HOME="$LAB/home" FM_ROOT_OVERRIDE="$LAB/home"
+# A real claude started under a scratch XDG_DATA_HOME can self-update into it and
+# repoint the operator's ~/.local/bin/claude there; the link dangles once $LAB is gone.
+export DISABLE_AUTOUPDATER=1
 
 cleanup_all() {
   if [ "${XDG_STATE_HOME:-}" = "$LAB" ] && [ "${HC_SESSION:-}" = "fmhl$$" ]; then
