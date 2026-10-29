@@ -40,7 +40,8 @@
 #   - `hc send` always presses Enter after pasting. There is no paste without
 #     submit, so hc cannot type without submitting.
 #   - hc reports one foreground process per terminal (`foreground` in
-#     `hc get`), not a process group; agent_state classifies that one process.
+#     `hc get`), not a process group; when that process is a launcher,
+#     agent_state also reads the rest of its process group from local `ps`.
 #   - hc has no event push this adapter consumes; supervision polls like tmux.
 
 # shellcheck source=bin/fm-backend-hometag-lib.sh
