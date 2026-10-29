@@ -1609,6 +1609,7 @@ SSH_AUTH_SOCK
 
 Firstmate retains basic home, executable search, terminal, locale, temporary-directory, and backend routing variables, plus its explicit launch assignments, its ship and scout task marker, the compact-adviser kill switch described below, and enabled task trace.
 The allowlist floor also retains Tern block markers `TERN_IDENTITY`, `TERN_PANE`, `TERN_PANE_SOCKET`, `TERN_WINDOW_KEY`, and `TERN_WINDOW_SOCKET` so a worker's own Tern/TSP integration survives `env -i`.
+It retains `HC_SESSION`, `HC_TERMINAL_ID`, `HC_TERMINAL_SOCKET`, and `HC_SCOPE` the same way, so a worker in an hc terminal still reports its status to herdr-core.
 [`fm-spawn.sh --help`](../bin/fm-spawn.sh) owns the exact retained names and parsing mechanics.
 
 Other ambient names must be listed explicitly, including custom credential-store locations, proxy settings, and certificate overrides when required by the selected tools.

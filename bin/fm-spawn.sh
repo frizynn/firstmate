@@ -406,7 +406,8 @@
 #   CMUX_WORKSPACE_ID CMUX_SURFACE_ID CMUX_TAB_ID CMUX_PANEL_ID CMUX_SOCKET_PATH
 #   ZELLIJ ZELLIJ_SESSION_NAME ZELLIJ_PANE_ID FM_ZELLIJ_SESSION TERM_PROGRAM
 #   REX_SESSION REX_BLOCK REX_SERVER REX_BIN_DIR TERN_IDENTITY TERN_PANE
-#   TERN_PANE_SOCKET TERN_WINDOW_KEY TERN_WINDOW_SOCKET, plus the task
+#   TERN_PANE_SOCKET TERN_WINDOW_KEY TERN_WINDOW_SOCKET HC_SESSION
+#   HC_TERMINAL_ID HC_TERMINAL_SOCKET HC_SCOPE, plus the task
 #   marker FM_TASK_ID that ship and scout panes receive above, plus the
 #   compact-adviser kill switch COMPACT_ADVISER_DISABLE, which the floor also
 #   pins to 1 with a literal assignment so it survives the cleared environment
@@ -5103,9 +5104,13 @@ spawn_send_literal() { # <target> <text>
   rex) fm_backend_rex_send_literal "$1" "$2" "$W" ;;
   t3code) fm_backend_t3code_send_literal "$1" "$2" ;;
   tern) fm_backend_tern_send_literal "$1" "$2" "$W" ;;
-  hc) fm_backend_hc_send_literal "$1" "$2" "$W" ;;
+  # hc has no paste without submit, and its keys cannot type the launch line's
+  # `+` or `_`, so the line is pasted and submitted here and the Enter that
+  # follows it is consumed below (docs/hc-backend.md "Limits").
+  hc) fm_backend_hc_send_text_line "$1" "$2" "$W" && SPAWN_HC_LINE_SUBMITTED=1 ;;
   esac
 }
+SPAWN_HC_LINE_SUBMITTED=0
 spawn_send_key() { # <target> <key>
   case "$BACKEND" in
   tmux) fm_backend_tmux_send_key "$1" "$2" ;;
@@ -5117,7 +5122,13 @@ spawn_send_key() { # <target> <key>
   rex) fm_backend_rex_send_key "$1" "$2" "$W" ;;
   t3code) fm_backend_t3code_send_literal "$1" "$2" ;;
   tern) fm_backend_tern_send_key "$1" "$2" "$W" ;;
-  hc) fm_backend_hc_send_key "$1" "$2" "$W" ;;
+  hc)
+    if [ "$2" = Enter ] && [ "$SPAWN_HC_LINE_SUBMITTED" = 1 ]; then
+      SPAWN_HC_LINE_SUBMITTED=0
+    else
+      fm_backend_hc_send_key "$1" "$2" "$W"
+    fi
+    ;;
   esac
 }
 
@@ -7263,6 +7274,7 @@ if [ "$LAUNCH_ENV_ENABLED" = 1 ]; then
     CMUX_SOCKET_PATH ZELLIJ ZELLIJ_SESSION_NAME ZELLIJ_PANE_ID FM_ZELLIJ_SESSION \
     TERM_PROGRAM REX_SESSION REX_BLOCK REX_SERVER REX_BIN_DIR \
     TERN_IDENTITY TERN_PANE TERN_PANE_SOCKET TERN_WINDOW_KEY TERN_WINDOW_SOCKET \
+    HC_SESSION HC_TERMINAL_ID HC_TERMINAL_SOCKET HC_SCOPE \
     FM_TASK_ID COMPACT_ADVISER_DISABLE LAVISH_AXI_HOST \
     $LAUNCH_ENV_FORWARD_NAMES; do
     if [ "$ORCA_LAUNCH_ENV_ENABLED" = 1 ]; then

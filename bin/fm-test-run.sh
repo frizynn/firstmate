@@ -365,7 +365,7 @@ family_for_basename() {
     fm-grok-continuity-live-e2e.test.sh|\
     fm-cursor-primary-live-e2e.test.sh|fm-agy-primary-live-e2e.test.sh|\
     fm-grok-stop-live-e2e.test.sh|fm-harness-adapter-instructions-live-e2e.test.sh|\
-    fm-harness-liveness-drift-live-e2e.test.sh|\
+    fm-harness-liveness-drift-live-e2e.test.sh|fm-backend-hc-liveness-live-e2e.test.sh|\
     fm-kimi-trust-prompt-live-e2e.test.sh|\
     fm-devin-signals-live-e2e.test.sh|fm-commandcode-signals-live-e2e.test.sh|fm-cortex-signals-live-e2e.test.sh|fm-muse-signals-live-e2e.test.sh|fm-rovo-signals-live-e2e.test.sh|fm-agy-signals-live-e2e.test.sh|fm-polytoken-signals-live-e2e.test.sh|\
     fm-launch-prompt-signals-live-e2e.test.sh|fm-backend-t3code-live-e2e.test.sh|\
@@ -731,9 +731,10 @@ tests/fm-agy-signals-live-e2e.test.sh 53
 tests/fm-approval-failover.test.sh 5410
 tests/fm-ask-user-authority.test.sh 171
 tests/fm-backend-cmux-smoke.test.sh 34
+tests/fm-backend-cmux.test.sh 3754
+tests/fm-backend-hc-liveness-live-e2e.test.sh 9000
 tests/fm-backend-hc-smoke.test.sh 3700
 tests/fm-backend-hc.test.sh 4000
-tests/fm-backend-cmux.test.sh 3754
 tests/fm-backend-orca.test.sh 27102
 tests/fm-backend-paseo-smoke.test.sh 40
 tests/fm-backend-paseo.test.sh 8000
@@ -1542,6 +1543,7 @@ families_for_changed_path() {
     bin/backends/hc.sh)
       printf '%s\n' hc
       printf '%s\n' backend-dispatch
+      printf '%s\n' "__script__:fm-backend-hc-liveness-live-e2e.test.sh"
       ;;
     bin/backends/orca*|bin/backends/tmux.sh)
       printf '%s\n' backend-dispatch

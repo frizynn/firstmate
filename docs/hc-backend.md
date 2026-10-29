@@ -69,17 +69,18 @@ An input, capture, or close that carries the task label refuses a terminal whose
 
 - `hc send` always presses Enter.
   Typing without submitting goes through `hc keys`, which has keys only for letters, digits, space, hyphen, slash, apostrophe, semicolon, backtick, backslash, equals, period, comma, and brackets; text with any other character is refused rather than half-typed.
-  The spawn launch line `. '<launch file>'` fits that set unless the home path contains another character, such as `_`.
+  The spawn launch line `. '<launch file>'` always carries a `+` and can carry a `_`, so `bin/fm-spawn.sh` pastes and submits it with `hc send` and consumes the Enter that follows it.
 - Submitting a message uses `hc send` and then reads the composer; only a proven pending composer gets Enter retries.
 - hc reports one foreground process per terminal.
   When that process is a launcher, the adapter also reads the rest of its process group from `ps`, which works only for terminals on the local machine.
 - Right after a terminal starts, `hc get` can report no foreground process yet, and agent state reads `unreadable` until the shell is up.
 - `--secondmate` spawns are refused.
-- Firstmate's cleared launch environment does not forward `HC_TERMINAL_ID`, so a worker cannot address its own terminal through hc, and whether hc's native agent status still reports under that environment is not verified.
+- A worker inherits `HC_SESSION`, `HC_TERMINAL_ID`, `HC_TERMINAL_SOCKET`, and `HC_SCOPE` from its terminal, and the `config/launch-env-allowlist` floor keeps them; whether a real harness then reports native status under Firstmate's launch is not verified.
 - Naming a Herdr.app space needs the app window and is not done; whether the labels above display as intended in Herdr.app is not verified.
 - hc has no event stream this adapter consumes; supervision polls like tmux.
 
 ## Tests
 
 `tests/fm-backend-hc.test.sh` pins the adapter against a fake `hc`.
+`tests/fm-backend-hc-liveness-live-e2e.test.sh` is the default-on live guard: it launches every installed harness bare in a private core and requires `alive`.
 `tests/fm-backend-hc-smoke.test.sh` drives the real `hc` against a private core with its own `HC_SESSION` and scratch XDG directories, and skips when `hc` or `jq` is missing.
