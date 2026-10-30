@@ -46,7 +46,7 @@ hc_terminal=<address>
 ```
 
 `<address>` is hc's terminal address such as `t7`.
-Every adapter call sets exactly the recorded `HC_SESSION`, so a task keeps reaching its own core even when the caller's environment names another one.
+Every adapter call sets exactly the recorded `HC_SESSION` and drops any inherited `HC_SOCKET`, which hc would otherwise prefer, so a task keeps reaching its own core even when the caller's environment names another one.
 An input, capture, or close that carries the task label refuses a terminal whose `firstmate.task` or `firstmate.home` label does not match, and a close without a label still refuses a terminal that lacks this home's labels.
 
 ## Operations
