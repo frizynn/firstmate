@@ -1,0 +1,17 @@
+hc hc 0.1.14  two private cores: A=fmsa11995 B=fmsb11995, each with terminal t1 labeled fm-coreA / fm-coreB
+
+== AFTER (commit 6c0a2f5a, bin/backends/hc.sh) ==
+$ HC_SOCKET=<core A socket> fm_backend_hc_cli fmsb11995 get t1   (pinned to core B)
+{"address":"t1","labels":{"firstmate.home":"firstmate-6cde1e55","firstmate.task":"fm-coreB","herdr.space":"fm-firstmate-6cde1e55","herdr.tab":"firstmate-6cde1e55-fm-coreB"}}
+$ HC_SOCKET=<core A socket> fm_backend_target_exists hc fmsb11995:t1 fm-coreB
+-> exists (core B task found)
+$ HC_SOCKET=<core A socket> fm_backend_target_exists hc fmsb11995:t1 fm-coreA  (adversarial: core A label)
+-> refused
+
+== BEFORE (base adapter, HC_SESSION only) ==
+$ HC_SOCKET=<core A socket> fm_backend_hc_cli fmsb11995 get t1   (pinned to core B)
+{"address":"t1","labels":{"firstmate.home":"firstmate-6cde1e55","firstmate.task":"fm-coreA","herdr.space":"fm-firstmate-6cde1e55","herdr.tab":"firstmate-6cde1e55-fm-coreA"}}
+$ HC_SOCKET=<core A socket> fm_backend_target_exists hc fmsb11995:t1 fm-coreB
+-> NOT FOUND (call went to the wrong core)
+$ HC_SOCKET=<core A socket> fm_backend_target_exists hc fmsb11995:t1 fm-coreA  (adversarial: core A label)
+-> exists (WRONG: matched core A terminal)
