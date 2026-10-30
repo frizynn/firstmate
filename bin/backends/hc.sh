@@ -59,12 +59,13 @@ fm_backend_hc_session() {
 
 # fm_backend_hc_cli: run hc against exactly <session>.
 # An invalid or empty session is refused: an empty HC_SESSION would let hc
-# fall back to whatever core the caller's environment names.
+# fall back to whatever core the caller's environment names. HC_SOCKET is
+# dropped because hc lets it win over HC_SESSION.
 fm_backend_hc_cli() {  # <session> <args...>
   local session=$1
   shift
   fm_backend_hc_atom_valid "$session" || { echo "error: refusing hc session '$session'" >&2; return 1; }
-  HC_SESSION=$session hc "$@"
+  env -u HC_SOCKET HC_SESSION="$session" hc "$@"
 }
 
 fm_backend_hc_atom_valid() {  # <value>

@@ -14,7 +14,7 @@ TMP_ROOT=$(fm_test_tmproot fm-backend-hc-tests)
 # The stub answers `get` from <dir>/<address>.json (exit from <address>.exit,
 # 3 = not_found when no file exists), `ls` from <dir>/ls.json, `run` with
 # <dir>/run.json, and removes <address>.json on `rm` unless <dir>/rm-sticks
-# exists. Every call is logged with its HC_SESSION.
+# exists. Every call is logged with its HC_SESSION and HC_SOCKET.
 make_hc_fakebin() {  # <dir> -> echoes fakebin dir
   local fb="$1/fakebin"
   mkdir -p "$fb"
@@ -23,7 +23,7 @@ make_hc_fakebin() {  # <dir> -> echoes fakebin dir
 set -u
 D="${FAKE_HC_DIR:?}"
 {
-  printf 'HC_SESSION=%s' "${HC_SESSION:-}"
+  printf 'HC_SESSION=%s HC_SOCKET=%s' "${HC_SESSION:-}" "${HC_SOCKET:-}"
   for a in "$@"; do printf '\x1f%s' "$a"; done
   printf '\n'
 } >> "$D/log"
@@ -161,6 +161,15 @@ test_invalid_session_never_reaches_hc() {
   pass "hc: an empty session never falls through to the ambient core"
 }
 
+# hc 0.1.14 lets an exported HC_SOCKET win over HC_SESSION, so an inherited one
+# would send every call to another core.
+test_inherited_socket_never_overrides_the_session() {
+  setup_case socket
+  HC_SOCKET=/elsewhere/other.sock hc_shell 'fm_backend_hc_cli fmtest ls' >/dev/null
+  assert_contains "$(cat "$D/log")" "HC_SESSION=fmtest HC_SOCKET="$'\x1f'"ls" "hc must run with HC_SOCKET unset"
+  pass "hc: an inherited HC_SOCKET never overrides the session pin"
+}
+
 test_agent_state_classifies_foreground_and_absence() {
   local tag out
   setup_case state
@@ -238,6 +247,7 @@ fm_test_run \
   test_control_interrupt_delivers_the_harness_keys \
   test_foreign_or_unlabeled_terminal_gets_no_input_and_no_close \
   test_invalid_session_never_reaches_hc \
+  test_inherited_socket_never_overrides_the_session \
   test_agent_state_classifies_foreground_and_absence \
   test_kill_proves_the_terminal_is_gone \
   test_kill_refuses_another_tasks_terminal \
