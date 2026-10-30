@@ -27,7 +27,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # hc's socket must fit a unix socket path, so the private root sits under /tmp.
 LAB=$(mktemp -d /tmp/fmhl.XXXXXX) || { echo "skip: no scratch directory"; exit 0; }
 mkdir -p "$LAB/wt" "$LAB/config" "$LAB/data" "$LAB/cache" "$LAB/home"
-unset HC_TERMINAL_ID HC_TERMINAL_SOCKET HC_SCOPE
+unset HC_TERMINAL_ID HC_TERMINAL_SOCKET HC_SCOPE HC_SOCKET
 export HC_SESSION="fmhl$$"
 export XDG_STATE_HOME="$LAB" XDG_RUNTIME_DIR="$LAB" XDG_CONFIG_HOME="$LAB/config"
 export XDG_DATA_HOME="$LAB/data" XDG_CACHE_HOME="$LAB/cache"

@@ -187,6 +187,25 @@ test_agent_state_classifies_foreground_and_absence() {
   pass "hc: agent_state maps foreground, finished, not_found and core errors onto the shared vocabulary"
 }
 
+test_agent_state_reads_a_shell_wrappers_group() {
+  local tag out wrapper
+  setup_case wrapper
+  tag=$(hometag_of)
+  # A shell wrapper in its own process group, waiting on a harness child.
+  set -m
+  bash -c '(exec -a claude sleep 30); :' &
+  wrapper=$!
+  set +m
+  write_terminal "$D" t9 live fm-a1 "$tag" bash bash
+  jq --argjson p "$wrapper" '.foreground.pid = $p' "$D/t9.json" > "$D/t9.tmp" && mv "$D/t9.tmp" "$D/t9.json"
+  for _ in 1 2 3 4 5 6 7 8 9 10; do pgrep -g "$wrapper" -f '^claude' >/dev/null && break; sleep 0.1; done
+  out=$(hc_shell 'fm_backend_agent_state hc fmtest:t9')
+  kill -- "-$wrapper" 2>/dev/null || true
+  wait "$wrapper" 2>/dev/null || true
+  assert_equals "$out" alive "a shell wrapper running a harness child is alive"
+  pass "hc: agent_state reads a shell wrapper's process group before calling it dead"
+}
+
 test_kill_proves_the_terminal_is_gone() {
   local tag
   setup_case kill
@@ -249,6 +268,7 @@ fm_test_run \
   test_invalid_session_never_reaches_hc \
   test_inherited_socket_never_overrides_the_session \
   test_agent_state_classifies_foreground_and_absence \
+  test_agent_state_reads_a_shell_wrappers_group \
   test_kill_proves_the_terminal_is_gone \
   test_kill_refuses_another_tasks_terminal \
   test_capture_and_current_path_read_the_recorded_terminal \

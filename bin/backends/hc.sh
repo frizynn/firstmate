@@ -303,7 +303,7 @@ fm_backend_hc_kill() {  # <target> [unused] [expected-label]
 # host the agent again, exactly like a closed tmux window. A live terminal is
 # classified from hc's foreground process through the shared classifier.
 fm_backend_hc_agent_state() {  # <target>
-  local json rc fields state name argv0 args pid
+  local json rc fields state name argv0 args pid class
   fm_backend_hc_parse_target "${1:-}" || { printf 'unreadable'; return 0; }
   json=$(fm_backend_hc_get "$1")
   rc=$?
@@ -323,14 +323,15 @@ EOF
     *) printf 'unreadable'; return 0 ;;
   esac
   [ -n "$name$argv0" ] || { printf 'unreadable'; return 0; }
-  case "$(fm_agent_process_classify "$name" "$argv0" "$args" "$pid")" in
-    agent) printf 'alive'; return 0 ;;
-    shell) printf 'dead'; return 0 ;;
-  esac
+  class=$(fm_agent_process_classify "$name" "$argv0" "$args" "$pid")
+  [ "$class" != agent ] || { printf 'alive'; return 0; }
   # A launcher (a wrapper script, or a tool that runs the harness as a child)
   # is what hc names as the foreground; the harness itself is another member
-  # of the same foreground process group, which is what tmux reads too.
+  # of the same foreground process group, which is what tmux reads too. A shell
+  # wrapper waiting on the harness is such a launcher, so a shell is only dead
+  # once its group holds no harness.
   fm_backend_hc_group_has_agent "$pid" && { printf 'alive'; return 0; }
+  [ "$class" != shell ] || { printf 'dead'; return 0; }
   printf 'ambiguous'
 }
 
